@@ -3,110 +3,82 @@
 const readline = require('readline');
 
 // ==========================================
-// TERMINAL STYLING & UTILITIES (Zero-dependency)
+// 1. SETUP READLINE FOR USER INPUT
 // ==========================================
-const colors = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  dim: '\x1b[2m',
-  cyan: '\x1b[36m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  red: '\x1b[31m',
-  magenta: '\x1b[35m',
-};
-
-function clearScreen() {
-  process.stdout.write('\x1b[2J\x1b[0f');
-}
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-const ask = (query) => new Promise((resolve) => rl.question(query, resolve));
-
-async function pause(message = 'Press Enter to return to main menu...') {
-  await ask(`\n${colors.dim}${message}${colors.reset}`);
+// Helper function to ask questions using async/await
+function ask(question) {
+  return new Promise((resolve) => rl.question(question, resolve));
 }
 
 // ==========================================
-// GAME REGISTRY & PLACEHOLDERS
+// 2. GAME FUNCTIONS (Placeholders)
 // ==========================================
 async function playTicTacToe() {
-  clearScreen();
-  console.log(`${colors.cyan}${colors.bold}=== Tic Tac Toe ===${colors.reset}\n`);
-  console.log(`${colors.yellow}Game module is loaded. Game logic will go here.${colors.reset}`);
-  await pause();
+  console.log('\n--- Tic Tac Toe ---');
+  console.log('Game logic will go here.');
+  await ask('\nPress Enter to return to main menu...');
 }
 
-async function playRPS() {
-  clearScreen();
-  console.log(`${colors.magenta}${colors.bold}=== Rock Paper Scissors ===${colors.reset}\n`);
-  console.log(`${colors.yellow}Game module is loaded. Game logic will go here.${colors.reset}`);
-  await pause();
+async function playRockPaperScissors() {
+  console.log('\n--- Rock Paper Scissors ---');
+  console.log('Game logic will go here.');
+  await ask('\nPress Enter to return to main menu...');
 }
 
-async function playGuessing() {
-  clearScreen();
-  console.log(`${colors.green}${colors.bold}=== Number Guessing ===${colors.reset}\n`);
-  console.log(`${colors.yellow}Game module is loaded. Game logic will go here.${colors.reset}`);
-  await pause();
+async function playNumberGuessing() {
+  console.log('\n--- Number Guessing ---');
+  console.log('Game logic will go here.');
+  await ask('\nPress Enter to return to main menu...');
 }
-
-const games = [
-  { id: '1', name: 'Tic Tac Toe', description: 'Classic 2-player grid game', handler: playTicTacToe },
-  { id: '2', name: 'Rock Paper Scissors', description: 'Classic quick duel vs CPU', handler: playRPS },
-  { id: '3', name: 'Number Guessing', description: 'Guess the hidden secret number', handler: playGuessing },
-];
 
 // ==========================================
-// MAIN MENU & ROUTER
+// 3. MAIN MENU & APPLICATION LOOP
 // ==========================================
-function displayBanner() {
-  console.log(`${colors.cyan}${colors.bold}==========================================`);
-  console.log(`           🎮 TERMINAL GAME HUB           `);
-  console.log(`==========================================${colors.reset}`);
-  console.log(`${colors.dim}Select a game from the registry below:${colors.reset}\n`);
-
-  games.forEach((game) => {
-    console.log(`  ${colors.green}${game.id}.${colors.reset} ${colors.bold}${game.name}${colors.reset} ${colors.dim}- ${game.description}${colors.reset}`);
-  });
-
-  console.log(`  ${colors.red}4.${colors.reset} ${colors.bold}Exit${colors.reset}\n`);
-}
-
 async function main() {
-  process.on('SIGINT', () => {
-    console.log(`\n\n${colors.yellow}Session terminated. Goodbye! 👋${colors.reset}\n`);
-    rl.close();
-    process.exit(0);
-  });
+  let isRunning = true;
 
-  while (true) {
-    clearScreen();
-    displayBanner();
+  while (isRunning) {
+    console.log(`
+================================
+       🎮 GAME HUB MENU
+================================
+1. Tic Tac Toe
+2. Rock Paper Scissors
+3. Number Guessing
+4. Exit
+`);
 
-    const input = (await ask(`${colors.bold}Enter your choice (1-${games.length + 1}): ${colors.reset}`)).trim();
+    const choice = (await ask('Enter your choice (1-4): ')).trim();
 
-    if (input === String(games.length + 1)) {
-      clearScreen();
-      console.log(`\n${colors.green}Thanks for visiting Terminal Game Hub! Goodbye. 👋${colors.reset}\n`);
-      break;
-    }
-
-    const selectedGame = games.find((g) => g.id === input);
-    if (selectedGame) {
-      await selectedGame.handler();
-    } else {
-      console.log(`\n${colors.red}Invalid choice! Please enter a number between 1 and ${games.length + 1}.${colors.reset}`);
-      await pause('Press Enter to try again...');
+    switch (choice) {
+      case '1':
+        await playTicTacToe();
+        break;
+      case '2':
+        await playRockPaperScissors();
+        break;
+      case '3':
+        await playNumberGuessing();
+        break;
+      case '4':
+        console.log('\nThanks for playing! Goodbye.\n');
+        isRunning = false;
+        break;
+      default:
+        console.log('\nInvalid choice! Please enter a number between 1 and 4.');
+        await ask('\nPress Enter to continue...');
+        break;
     }
   }
 
   rl.close();
 }
 
+// Start the application
 main();
 
