@@ -1,0 +1,13 @@
+{
+  "name": "terminal-game-hub",
+  "version": "1.0.0",
+  "description": "A terminal-based mini-game hub with Tic Tac Toe, Rock Paper Scissors, and Number Guessing.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "MIT"
+}
