@@ -3,6 +3,7 @@
 const readline = require('readline');
 
 // Import modular games
+const playTicTacToe = require('./games/tictactoe');
 const playRPS = require('./games/rps');
 const playGuessing = require('./games/guessing');
 
@@ -20,16 +21,7 @@ function ask(question) {
 }
 
 // ==========================================
-// 2. PLACEHOLDER GAMES (To be modularized)
-// ==========================================
-async function playTicTacToe() {
-  console.log('\n--- Tic Tac Toe ---');
-  console.log('Game logic will go here.');
-  await ask('\nPress Enter to return to main menu...');
-}
-
-// ==========================================
-// 3. MAIN MENU & APPLICATION LOOP
+// 2. MAIN MENU & APPLICATION LOOP
 // ==========================================
 async function main() {
   let isRunning = true;
@@ -49,7 +41,7 @@ async function main() {
 
     switch (choice) {
       case '1':
-        await playTicTacToe();
+        await playTicTacToe(ask);
         break;
       case '2':
         await playRPS(ask);
@@ -73,5 +65,6 @@ async function main() {
 
 // Start the application
 main();
+
 
 
