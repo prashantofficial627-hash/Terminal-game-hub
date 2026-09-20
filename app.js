@@ -2,69 +2,137 @@
 
 const readline = require('readline');
 
-// Import modular games
+// Import modular game functions
 const playTicTacToe = require('./games/tictactoe');
 const playRPS = require('./games/rps');
 const playGuessing = require('./games/guessing');
 
 // ==========================================
-// 1. SETUP READLINE FOR USER INPUT
+// 1. INPUT HELPER (for game text prompts)
 // ==========================================
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-// Helper function to ask questions using async/await
 function ask(question) {
-  return new Promise((resolve) => rl.question(question, resolve));
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
 }
 
 // ==========================================
-// 2. MAIN MENU & APPLICATION LOOP
+// 2. ARROW-KEY SELECTION MENU
+// ==========================================
+function selectMenu(title, options) {
+  return new Promise((resolve) => {
+    let selectedIndex = 0;
+
+    // Enable keypress events on terminal input
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+    }
+    process.stdin.resume();
+
+    function render() {
+      console.clear();
+      console.log(title);
+
+      options.forEach((opt, idx) => {
+        if (idx === selectedIndex) {
+          console.log(` > [ ${opt} ]`);
+        } else {
+          console.log(`     ${opt}`);
+        }
+      });
+
+      console.log('\nUse UP/DOWN arrows to navigate, Enter to select.\n');
+    }
+
+    function onKeyPress(str, key) {
+      if (!key) return;
+
+      if (key.ctrl && key.name === 'c') {
+        cleanup();
+        console.clear();
+        console.log('Session ended. Goodbye!\n');
+        process.exit(0);
+      } else if (key.name === 'up') {
+        selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+        render();
+      } else if (key.name === 'down') {
+        selectedIndex = (selectedIndex + 1) % options.length;
+        render();
+      } else if (key.name === 'return' || key.name === 'enter') {
+        cleanup();
+        resolve(selectedIndex);
+      }
+    }
+
+    function cleanup() {
+      process.stdin.removeListener('keypress', onKeyPress);
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(false);
+      }
+      process.stdin.pause();
+    }
+
+    process.stdin.on('keypress', onKeyPress);
+    render();
+  });
+}
+
+// ==========================================
+// 3. MAIN APPLICATION LOOP
 // ==========================================
 async function main() {
+  const menuTitle = `
+================================
+       🎮 GAME HUB MENU
+================================`;
+
+  const menuOptions = [
+    'Tic Tac Toe',
+    'Rock Paper Scissors',
+    'Number Guessing',
+    'Exit'
+  ];
+
   let isRunning = true;
 
   while (isRunning) {
-    console.log(`
-================================
-       🎮 GAME HUB MENU
-================================
-1. Tic Tac Toe
-2. Rock Paper Scissors
-3. Number Guessing
-4. Exit
-`);
+    const selected = await selectMenu(menuTitle, menuOptions);
 
-    const choice = (await ask('Enter your choice (1-4): ')).trim();
+    console.clear();
 
-    switch (choice) {
-      case '1':
+    switch (selected) {
+      case 0:
         await playTicTacToe(ask);
         break;
-      case '2':
+      case 1:
         await playRPS(ask);
         break;
-      case '3':
+      case 2:
         await playGuessing(ask);
         break;
-      case '4':
-        console.log('\nThanks for playing! Goodbye.\n');
+      case 3:
+        console.log('\nThanks for playing Game Hub! Goodbye.\n');
         isRunning = false;
-        break;
-      default:
-        console.log('\nInvalid choice! Please enter a number between 1 and 4.');
-        await ask('\nPress Enter to continue...');
         break;
     }
   }
-
-  rl.close();
 }
 
-// Start the application
+// Start application
 main();
+
+
+
+
 
 
 
