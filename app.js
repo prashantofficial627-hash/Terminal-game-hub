@@ -30,9 +30,45 @@ async function playRockPaperScissors() {
   await ask('\nPress Enter to return to main menu...');
 }
 
+// 2. Number Guessing Game (Fully Linked & Playable)
 async function playNumberGuessing() {
-  console.log('\n--- Number Guessing ---');
-  console.log('Game logic will go here.');
+  console.log('\n================================');
+  console.log('     🎯 NUMBER GUESSING GAME     ');
+  console.log('================================');
+  console.log('I picked a secret number between 1 and 100.');
+
+  const secretNumber = Math.floor(Math.random() * 100) + 1;
+  let attempts = 0;
+
+  while (true) {
+    const input = (await ask('\nEnter your guess (or "q" to quit): ')).trim().toLowerCase();
+
+    if (input === 'q') {
+      console.log(`\nGame exited. The secret number was ${secretNumber}.`);
+      break;
+    }
+
+    const guess = parseInt(input, 10);
+
+    // Validate input
+    if (isNaN(guess) || guess < 1 || guess > 100) {
+      console.log('⚠️ Please enter a valid number between 1 and 100.');
+      continue;
+    }
+
+    attempts++;
+
+    // Check guess against secret number
+    if (guess === secretNumber) {
+      console.log(`\n🎉 Congratulations! You found the number in ${attempts} attempts! 🏆`);
+      break;
+    } else if (guess < secretNumber) {
+      console.log('📈 Too low! Try a higher number.');
+    } else {
+      console.log('📉 Too high! Try a lower number.');
+    }
+  }
+
   await ask('\nPress Enter to return to main menu...');
 }
 
